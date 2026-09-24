@@ -5,6 +5,8 @@ FROM
 
 -- Number of Total Customers : 3333
 
+
+
 SELECT 
 	Churn AS 'Churned Customers', 
 	COUNT(*) AS Count
@@ -16,6 +18,8 @@ GROUP BY
 	Churn;
 
 -- Number of Customers Churned : 483
+
+
 
 SELECT 
 	Churn AS 'Churned Customers', 
@@ -29,6 +33,8 @@ GROUP BY
 
 -- Nuber of Retained Customers : 2850
 
+
+
 SELECT  
 	ROUND((SUM(Churn)* 1.0 / COUNT(*)) * 100,2) AS 'Churn Rate'
 FROM 
@@ -36,3 +42,12 @@ FROM
 
 
 -- Churn Rate : 14.49 %
+
+
+
+SELECT  
+	ROUND(((SELECT COUNT(*) FROM telecom_churn WHERE Churn = 0) * 1.0 )/ COUNT(*) * 100,2) AS 'Retention Rate'
+FROM 
+	telecom_churn;
+	
+-- Retention Rate : 85.51 %
