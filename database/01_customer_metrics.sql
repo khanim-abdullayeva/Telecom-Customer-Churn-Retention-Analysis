@@ -1,5 +1,5 @@
 SELECT COUNT(*) AS 'Total Customers'
-FROM telecom_churn
+FROM telecom_churn;
 
 -- Number of Total Customers
 
