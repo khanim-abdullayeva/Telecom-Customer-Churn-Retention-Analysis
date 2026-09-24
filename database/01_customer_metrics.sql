@@ -11,7 +11,7 @@ SELECT
 FROM 
 	telecom_churn
 WHERE 
-	Churn = '1'
+	Churn = 1
 GROUP BY 
 	Churn;
 
@@ -23,15 +23,16 @@ SELECT
 FROM 
 	telecom_churn
 WHERE
-	Churn = '0'
+	Churn = 0
 GROUP BY 
 	Churn;
 
 -- Nuber of Retained Customers : 2850
 
-SELECT 
-	Churn AS 'Churned Customers', 
-	(SELECT 
-		COUNT(*) 
-	 WHERE 
-		
+SELECT  
+	ROUND((SUM(Churn)* 1.0 / COUNT(*)) * 100,2) AS 'Churn Rate'
+FROM 
+	telecom_churn;
+
+
+-- Churn Rate : 14.49 %
