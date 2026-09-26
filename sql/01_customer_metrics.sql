@@ -10,35 +10,35 @@ FROM
 
 
 SELECT 
-	Churn AS 'Churned Customers', 
+	churn AS 'Churned Customers', 
 	COUNT(*) AS Count
 FROM 
 	telecom_churn
 WHERE 
-	Churn = 1
+	churn = 1
 GROUP BY 
-	Churn;
+	churn;
 
 -- Number of Customers Churned : 483
 
 
 
 SELECT 
-	Churn AS 'Churned Customers', 
+	churn AS 'Churned Customers', 
 	COUNT(*) as Count
 FROM 
 	telecom_churn
 WHERE
-	Churn = 0
+	churn = 0
 GROUP BY 
-	Churn;
+	churn;
 
 -- Nuber of Retained Customers : 2850
 
 
 
 SELECT  
-	ROUND((SUM(Churn)* 1.0 / COUNT(*)) * 100,2) AS 'Churn Rate'
+	ROUND((SUM(churn)* 1.0 / COUNT(*)) * 100,2) AS 'Churn Rate'
 FROM 
 	telecom_churn;
 
@@ -48,7 +48,7 @@ FROM
 
 
 SELECT  
-	ROUND(((SELECT COUNT(*) FROM telecom_churn WHERE Churn = 0) * 1.0 )/ COUNT(*) * 100,2) AS 'Retention Rate'
+	ROUND(((SELECT COUNT(*) FROM telecom_churn WHERE churn = 0) * 1.0 )/ COUNT(*) * 100,2) AS 'Retention Rate'
 FROM 
 	telecom_churn;
 	
