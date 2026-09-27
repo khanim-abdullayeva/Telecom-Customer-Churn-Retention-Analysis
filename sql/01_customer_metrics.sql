@@ -1,4 +1,4 @@
--- Dataset Overview
+-- Customer Overview
 
 SELECT 
 	COUNT(*) AS 'Total Customers'
@@ -53,3 +53,13 @@ FROM
 	telecom_churn;
 	
 -- Retention Rate : 85.51 %
+
+
+SELECT 
+	ROUND(AVG(account_weeks),2) AS 'Average Account Weeks'
+FROM 
+	telecom_churn;
+	
+-- Average Account Weeks : 101.06
+
+
