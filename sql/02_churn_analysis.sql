@@ -174,7 +174,7 @@ FROM
 -- Churn by Monthly Charge Analysis
 
 
-
+-- Segment customers into four monthly charge groups based on their monthly charges.
 
 DROP TABLE IF EXISTS temp_3;
 CREATE TEMPORARY TABLE temp_3 AS
@@ -190,7 +190,8 @@ FROM
 	telecom_churn;
 	
 
-	
+-- Calculate total and churned customers for each monthly charge segment,
+-- then join both results to calculate the churn rate for each segment.	
 
 DROP TABLE IF EXISTS temp_4;
 CREATE TEMPORARY TABLE temp_4 AS 
@@ -218,6 +219,9 @@ LEFT JOIN
 ON
 	c."Charge Segment" = c1.charge_segment;
 	
+	
+-- Calculate the churn rate for each monthly charge segment and sort the results by churn rate.
+	
 SELECT 
 	*,
 	ROUND(("Churned Customers" * 1.0 / "Total Customers") * 100, 2) AS "Churn Rate"
@@ -225,3 +229,10 @@ FROM
 	temp_4
 ORDER BY
 	"Churn Rate";
+	
+/*
+Churn rate varies across monthly charge segments, 
+with customers in the High charge segment showing the highest churn rate (27.44%). 
+Customers in the Low and Very High segments have lower churn rates, at 13.95% and 10.56%, respectively, 
+while the Medium segment has the lowest churn rate (9.15%).
+*/
