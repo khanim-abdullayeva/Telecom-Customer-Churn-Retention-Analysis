@@ -170,9 +170,13 @@ FROM
 	temp_2;
 	
 	
+	
 -- Churn by Monthly Charge Analysis
 
 
+
+
+DROP TABLE IF EXISTS temp_3;
 CREATE TEMPORARY TABLE temp_3 AS
 SELECT 
 	*,
@@ -180,33 +184,44 @@ SELECT
 		WHEN monthly_charge <= 38 THEN 'Low'
 		WHEN monthly_charge <= 62 THEN 'Medium'
 		WHEN monthly_charge <= 87 THEN 'High'
-		WHEN monthly_charge <= 111 THEN 'Very High'
+		WHEN monthly_charge <= 112 THEN 'Very High'
 	END AS charge_segment
 FROM
 	telecom_churn;
 	
+
 	
+
+DROP TABLE IF EXISTS temp_4;
 CREATE TEMPORARY TABLE temp_4 AS 
 SELECT 
-	m.*,
-	m1."Churned Customers"
+	c.*,
+	c1."Churned Customers"
 FROM 	
 	(SELECT
-		monthly_charge AS "Monthly Charge",
+		charge_segment AS "Charge Segment",
 		COUNT(*) AS "Total Customers"
 	FROM	
 		temp_3
 	GROUP BY
-		monthly_charge) m
+		charge_segment) c
 LEFT JOIN 
 	(SELECT 
-		monthly_charge,
+		charge_segment,
 		COUNT(*) AS "Churned Customers"
 	FROM 
 		temp_3
 	WHERE
 		churn = 1
 	GROUP BY 
-		monthly_charge) m1
+		charge_segment) c1
 ON
-	m."Monthly Charge" = m1.monthly_charge;
+	c."Charge Segment" = c1.charge_segment;
+	
+SELECT 
+	*,
+	ROUND(("Churned Customers" * 1.0 / "Total Customers") * 100, 2) AS "Churn Rate"
+FROM 
+	temp_4
+ORDER BY
+	"Churn Rate";
