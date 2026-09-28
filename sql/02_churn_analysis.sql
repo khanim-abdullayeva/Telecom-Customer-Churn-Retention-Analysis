@@ -117,6 +117,7 @@ although the sample sizes for 7–9 calls are very small.
 
 -- Churn by Account Tenure
 
+-- Segment customers into four account tenure groups based on the number of account weeks.
 
 CREATE TEMP TABLE temp_1 AS 
 SELECT 
@@ -130,6 +131,10 @@ SELECT
 FROM 
 	telecom_churn;
 
+	
+-- Calculate total and churned customers for each account tenure segment,
+-- then join both results to calculate the churn rate for each segment.	
+	
 CREATE TEMPORARY TABLE temp_2 AS 
 SELECT 
 	s.*,
@@ -156,6 +161,7 @@ ON
 	s.Segment = s1.segment;
 
 
+-- Calculate the churn rate for each account tenure segment.	
 	
 SELECT
 	*,
