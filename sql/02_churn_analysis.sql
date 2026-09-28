@@ -69,6 +69,10 @@ GROUP BY
 
 -- Churn by Customer Service Calls
 
+/*
+Calculate total and churned customers for each number of customer service calls,
+then join the results to calculate the churn rate for each group.
+*/
 
 CREATE TEMP TABLE joined AS
 SELECT 
@@ -103,8 +107,58 @@ FROM
 	joined;
 
 	
-/* 
+/*
 Customers with 4 or more customer service calls 
 show substantially higher churn rates, 
 although the sample sizes for 7–9 calls are very small.
-/*
+*/
+
+
+
+-- Churn by Account Tenure
+
+
+CREATE TEMP TABLE temp_1 AS 
+SELECT 
+	*, 
+	CASE                                                          
+		WHEN account_weeks <= 60 THEN 'New'
+		WHEN account_weeks <= 120 THEN 'Established'
+		WHEN account_weeks <= 180 THEN 'Long-term'
+		WHEN account_weeks <= 243 THEN 'Very long-term'
+	END AS segment
+FROM 
+	telecom_churn;
+
+CREATE TEMPORARY TABLE temp_2 AS 
+SELECT 
+	s.*,
+	s1."Churned Customers"
+FROM 	
+	(SELECT
+		segment AS Segment,
+		COUNT(*) AS "Total Customers"
+	FROM	
+		temp_1
+	GROUP BY
+		segment) s
+LEFT JOIN 
+	(SELECT 
+		segment,
+		COUNT(*) AS "Churned Customers"
+	FROM 
+		temp_1
+	WHERE
+		churn = 1
+	GROUP BY 
+		segment) s1
+ON
+	s.Segment = s1.segment;
+
+
+	
+SELECT
+	*,
+	ROUND(("Churned Customers" * 1.0 / "Total Customers") * 100, 2) AS "Churn Rate"
+FROM
+	temp_2;
