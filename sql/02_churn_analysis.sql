@@ -65,3 +65,46 @@ GROUP BY
 
 -- Churn Rate of Customers who do not have Data Plan : 16.72 %
 
+
+
+-- Churn by Customer Service Calls
+
+
+CREATE TEMP TABLE joined AS
+SELECT 
+	c.*,
+	c1."Churned Customers"
+FROM
+	(SELECT 
+		cust_serv_calls AS "Customer Service Calls",
+		COUNT(*) AS "Total Customers"
+	FROM
+		telecom_churn
+	GROUP BY 
+		cust_serv_calls) c
+LEFT JOIN 
+	(SELECT 
+		cust_serv_calls AS "Customer Service Calls",
+		COUNT(*) AS "Churned Customers"
+	FROM
+		telecom_churn
+	WHERE
+		churn = 1
+	GROUP BY 
+		cust_serv_calls) c1
+ON 
+	c."Customer Service Calls" = c1."Customer Service Calls"
+;
+
+SELECT 
+	*,
+	ROUND(("Churned Customers" * 1.0 / "Total Customers")*100,2) AS "Churn Rate"
+FROM
+	joined;
+
+	
+/* 
+Customers with 4 or more customer service calls 
+show substantially higher churn rates, 
+although the sample sizes for 7–9 calls are very small.
+/*
