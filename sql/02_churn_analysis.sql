@@ -70,8 +70,8 @@ GROUP BY
 -- Churn by Customer Service Calls
 
 /*
-Calculate total and churned customers for each number of customer service calls,
-then join the results to calculate the churn rate for each group.
+	Calculate total and churned customers for each number of customer service calls,
+	then join the results to calculate the churn rate for each group.
 */
 
 CREATE TEMP TABLE joined AS
@@ -108,9 +108,9 @@ FROM
 
 	
 /*
-Customers with 4 or more customer service calls 
-show substantially higher churn rates, 
-although the sample sizes for 7–9 calls are very small.
+	Customers with 4 or more customer service calls 
+	show substantially higher churn rates, 
+	although the sample sizes for 7–9 calls are very small.
 */
 
 
@@ -131,9 +131,11 @@ SELECT
 FROM 
 	telecom_churn;
 
-	
--- Calculate total and churned customers for each account tenure segment,
--- then join both results to calculate the churn rate for each segment.	
+/*	
+	Calculate total and churned customers for each account tenure segment,
+	then join both results to calculate the churn rate for each segment.	
+*/
+
 	
 CREATE TEMPORARY TABLE temp_2 AS 
 SELECT 
@@ -191,8 +193,8 @@ FROM
 	
 
 /*
-Calculate total and churned customers for each monthly charge segment,
-then join both results to calculate the churn rate for each segment.	
+	Calculate total and churned customers for each monthly charge segment,
+	then join both results to calculate the churn rate for each segment.	
 */
 
 DROP TABLE IF EXISTS temp_4;
@@ -233,10 +235,10 @@ ORDER BY
 	"Churn Rate";
 	
 /*
-Churn rate varies across monthly charge segments, 
-with customers in the High charge segment showing the highest churn rate (27.44%). 
-Customers in the Low and Very High segments have lower churn rates, at 13.95% and 10.56%, respectively, 
-while the Medium segment has the lowest churn rate (9.15%).
+	Churn rate varies across monthly charge segments, 
+	with customers in the High charge segment showing the highest churn rate (27.44%). 
+	Customers in the Low and Very High segments have lower churn rates, at 13.95% and 10.56%, respectively, 
+	while the Medium segment has the lowest churn rate (9.15%).
 */
 
 
@@ -260,8 +262,8 @@ FROM
 
 
 /*
-Calculate total and churned customers for each data usage segment,
-then join both results to calculate the churn rate for each segment.	
+	Calculate total and churned customers for each data usage segment,
+	then join both results to calculate the churn rate for each segment.	
 */
 
 CREATE TEMPORARY TABLE temp_6 AS	
@@ -299,3 +301,73 @@ FROM
 	temp_6
 ORDER BY
 	"Churn Rate";
+
+/*
+	Churn rate is highest among customers with no data usage (17.76%) and 
+	generally lower among customers who use mobile data. 
+	This suggests that data usage is associated with lower churn in this dataset, 
+	although the analysis does not establish a causal relationship
+*/
+
+
+
+-- Churn by Roaming Minutes
+
+-- Segment customers based on their level of roamin minutes.
+
+CREATE TEMP TABLE temp_7 AS
+SELECT
+	*,
+	CASE
+		WHEN roam_mins <= 5 THEN 'Low'
+		WHEN roam_mins <= 10 THEN 'Moderate'
+		WHEN roam_mins <= 15 THEN 'High'
+		WHEN roam_mins <= 20 THEN 'Very High'
+	END AS roam_segment
+FROM
+	telecom_churn;
+	
+	
+/*	
+	Calculate total and churned customers for each roaming segment,
+	then join both results to calculate the churn rate for each segment.
+*/
+	
+CREATE TEMP TABLE temp_8 AS
+SELECT 
+	r.*,
+	r1."Churned Customers"
+FROM
+	(SELECT
+		roam_segment AS "Roaming Segment",
+		COUNT(*) AS "Total Customers"
+	FROM 
+		temp_7
+	GROUP BY
+		roam_segment) r
+LEFT JOIN
+	(SELECT 
+		roam_segment,
+		COUNT(*) AS "Churned Customers"
+	 FROM
+		temp_7
+	WHERE
+		churn = 1
+	GROUP BY
+		roam_segment) r1
+ON 
+	r."Roaming Segment" = r1.roam_segment;
+	
+	
+-- Calculate the churn rate for each roaming segment and sort the results by churn rate.	
+	
+SELECT 
+	*,
+	ROUND(("Churned Customers" * 1.0 / "Total Customers") * 100, 2) AS "Churn Rate"
+FROM
+	temp_8;
+
+/*
+	Churn rate generally increases with higher roaming minutes,
+	with the highest churn rate observed among very-high roaming users (19.51%).
+*/
