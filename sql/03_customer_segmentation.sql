@@ -38,3 +38,16 @@ SELECT
 	END AS data_usage_segment
 FROM
 	telecom_churn;
+	
+	
+-- Customer Service Risk Segmentation
+
+SELECT
+	*,
+	CASE
+		WHEN cust_serv_calls <= 3 THEN 'Low Support Usage'
+		WHEN cust_serv_calls >= 6 THEN 'Medium Support Usage'
+		WHEN cust_serv_calls <= 9 THEN 'High Support Usage'
+	END AS cust_serv_calls_segment
+FROM
+	telecom_churn;
