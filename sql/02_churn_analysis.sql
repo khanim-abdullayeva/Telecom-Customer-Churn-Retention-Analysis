@@ -371,3 +371,67 @@ FROM
 	Churn rate generally increases with higher roaming minutes,
 	with the highest churn rate observed among very-high roaming users (19.51%).
 */
+
+
+
+-- Churn by Overage Fee
+
+
+-- Segment customers based on their level of overage fees.
+
+CREATE TEMP TABLE temp_9 AS
+SELECT
+	*,
+	CASE
+		WHEN overage_fee <= 6 THEN 'Low'
+		WHEN overage_fee <= 12 THEN 'Moderate'
+		WHEN overage_fee <= 19 THEN 'High'
+	END AS overage_fee_segment
+FROM
+	telecom_churn;
+	
+	
+/*	
+	Calculate total and churned customers for each overage fee segment,
+	then join both results to calculate the churn rate for each segment.
+*/	
+
+
+CREATE TEMP TABLE temp_10 AS
+SELECT 
+	o.*,
+	o1."Churned Customers"
+FROM
+	(SELECT
+		overage_fee_segment AS "Overage Fee Segment",
+		COUNT(*) AS "Total Customers"
+	FROM
+		temp_9
+	GROUP BY 
+		overage_fee_segment) o
+LEFT JOIN
+	(SELECT 
+		overage_fee_segment,
+		COUNT(*) AS "Churned Customers"
+	 FROM
+		temp_9
+	 WHERE
+		churn = 1
+	 GROUP BY
+		overage_fee_segment) o1
+ON
+	o."Overage Fee Segment" = o1.overage_fee_segment;
+		
+		
+-- Calculate the churn rate for each overage fee segment.		
+	 
+SELECT
+	*,
+	Round(("Churned Customers" * 1.0 / "Total Customers") * 100, 2) AS "Churn Rate"
+FROM
+	temp_10;
+	
+/*
+	Higher overage fee segments are associated with higher churn rates,
+	with the highest churn rate observed among high-fee customers (19.52%).
+*/
