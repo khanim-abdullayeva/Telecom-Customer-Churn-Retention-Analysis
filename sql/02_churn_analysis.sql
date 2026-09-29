@@ -190,8 +190,10 @@ FROM
 	telecom_churn;
 	
 
--- Calculate total and churned customers for each monthly charge segment,
--- then join both results to calculate the churn rate for each segment.	
+/*
+Calculate total and churned customers for each monthly charge segment,
+then join both results to calculate the churn rate for each segment.	
+*/
 
 DROP TABLE IF EXISTS temp_4;
 CREATE TEMPORARY TABLE temp_4 AS 
@@ -241,6 +243,9 @@ while the Medium segment has the lowest churn rate (9.15%).
 
 -- Churn by Data Usage
 
+
+-- Segment customers based on their level of data usage.
+
 CREATE TEMPORARY TABLE temp_5 AS
 SELECT
 	*,
@@ -253,7 +258,12 @@ SELECT
 FROM
 	telecom_churn;
 
-	
+
+/*
+Calculate total and churned customers for each data usage segment,
+then join both results to calculate the churn rate for each segment.	
+*/
+
 CREATE TEMPORARY TABLE temp_6 AS	
 SELECT 
 	d.*,
@@ -279,7 +289,9 @@ LEFT JOIN
 ON 
 	d."Data Usage Segment" = d1.data_usage_segment;
 
-
+ 
+-- Calculate the churn rate for each data usage segment and sort the results by churn rate.
+ 
 SELECT 
 	*,
 	ROUND(("Churned Customers" *1.0/ "Total Customers") * 100, 2) AS "Churn Rate"
