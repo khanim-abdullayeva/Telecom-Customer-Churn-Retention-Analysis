@@ -2,10 +2,10 @@
 
 
 SELECT
-	contract_renewal AS 'Contract Renewal',
-	churn AS 'Churn',
-	COUNT(*) AS 'Count',
-	ROUND((SELECT COUNT(*) FROM telecom_churn WHERE churn = 1 and contract_renewal = 1)*1.0/ (SELECT COUNT(*) FROM telecom_churn WHERE contract_renewal = 1)*100,2) AS 'Churn Rate'
+	contract_renewal AS "Contract Renewal",
+	churn AS Churn,
+	COUNT(*) AS Count,
+	ROUND((SELECT COUNT(*) FROM telecom_churn WHERE churn = 1 and contract_renewal = 1)*1.0/ (SELECT COUNT(*) FROM telecom_churn WHERE contract_renewal = 1)*100,2) AS "Churn Rate"
 FROM
 	telecom_churn
 WHERE
@@ -18,10 +18,10 @@ GROUP BY
 
 
 SELECT
-	contract_renewal AS 'Contract Renewal',
-	churn AS 'Churn',
-	COUNT(*) AS 'Count',
-	ROUND((SELECT COUNT(*) FROM telecom_churn WHERE churn = 1 and contract_renewal = 0)*1.0/ (SELECT COUNT(*) FROM telecom_churn WHERE contract_renewal = 0)*100,2) AS 'Churn Rate'
+	contract_renewal AS "Contract Renewal",
+	churn AS Churn,
+	COUNT(*) AS Count,
+	ROUND((SELECT COUNT(*) FROM telecom_churn WHERE churn = 1 and contract_renewal = 0)*1.0/ (SELECT COUNT(*) FROM telecom_churn WHERE contract_renewal = 0)*100,2) AS "Churn Rate"
 FROM
 	telecom_churn
 WHERE
@@ -37,10 +37,10 @@ GROUP BY
 
 
 SELECT
-	data_plan AS 'Data Plan',
-	churn AS 'Churn',
-	COUNT(*) AS 'Count',
-	ROUND((SELECT COUNT(*) FROM telecom_churn WHERE churn = 1 and data_plan = 1)*1.0/ (SELECT COUNT(*) FROM telecom_churn WHERE data_plan = 1)*100,2) AS 'Churn Rate'
+	data_plan AS "Data Plan",
+	churn AS Churn,
+	COUNT(*) AS Count,
+	ROUND((SELECT COUNT(*) FROM telecom_churn WHERE churn = 1 and data_plan = 1)*1.0/ (SELECT COUNT(*) FROM telecom_churn WHERE data_plan = 1)*100,2) AS "Churn Rate"
 FROM
 	telecom_churn
 WHERE
@@ -52,10 +52,10 @@ GROUP BY
 
 
 SELECT
-	data_plan AS 'Data Plan',
-	churn AS 'Churn',
-	COUNT(*) AS 'Count',
-	ROUND((SELECT COUNT(*) FROM telecom_churn WHERE churn = 1 and data_plan = 0)*1.0/ (SELECT COUNT(*) FROM telecom_churn WHERE data_plan = 0)*100,2) AS 'Churn Rate'
+	data_plan AS "Data Plan",
+	churn AS Churn,
+	COUNT(*) AS Count,
+	ROUND((SELECT COUNT(*) FROM telecom_churn WHERE churn = 1 and data_plan = 0)*1.0/ (SELECT COUNT(*) FROM telecom_churn WHERE data_plan = 0)*100,2) AS "Churn Rate"
 FROM
 	telecom_churn
 WHERE
@@ -236,3 +236,54 @@ with customers in the High charge segment showing the highest churn rate (27.44%
 Customers in the Low and Very High segments have lower churn rates, at 13.95% and 10.56%, respectively, 
 while the Medium segment has the lowest churn rate (9.15%).
 */
+
+
+
+-- Churn by Data Usage
+
+CREATE TEMPORARY TABLE temp_5 AS
+SELECT
+	*,
+	CASE
+		WHEN data_usage = 0 THEN 'No Data Usage'
+		WHEN data_usage >= 2 THEN 'High Data Usage'
+		WHEN data_usage >= 1 THEN 'Moderate Data Usage'
+		WHEN data_usage > 0 AND data_usage < 1 THEN 'Low Data Usage'
+	END AS data_usage_segment
+FROM
+	telecom_churn;
+
+	
+CREATE TEMPORARY TABLE temp_6 AS	
+SELECT 
+	d.*,
+	d1."Churned Customers"
+FROM
+	(SELECT 
+		data_usage_segment AS "Data Usage Segment",
+		COUNT(*) AS "Total Customers"
+	FROM
+		temp_5
+	GROUP BY 
+		data_usage_segment) d
+LEFT JOIN
+	(SELECT
+		data_usage_segment,
+		COUNT(*) AS "Churned Customers"
+	 FROM
+		temp_5
+	 WHERE
+		churn = 1
+	 GROUP BY
+		data_usage_segment) d1
+ON 
+	d."Data Usage Segment" = d1.data_usage_segment;
+
+
+SELECT 
+	*,
+	ROUND(("Churned Customers" *1.0/ "Total Customers") * 100, 2) AS "Churn Rate"
+FROM
+	temp_6
+ORDER BY
+	"Churn Rate";
