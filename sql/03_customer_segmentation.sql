@@ -39,7 +39,7 @@ LEFT JOIN
 ON
 	s."Customer Segment" = s1.segment;
 
---Segment performance
+--Tenure Segment Performance
 
 SELECT
 	j.*,
@@ -112,6 +112,7 @@ ON
 
 
 -- Customer Value Segment Performance
+
 SELECT
 		c.*,
 		c1."Average Monthly Charge",
