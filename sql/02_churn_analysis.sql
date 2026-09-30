@@ -119,6 +119,7 @@ FROM
 
 -- Segment customers into four account tenure groups based on the number of account weeks.
 
+DROP TABLE IF EXISTS temp_1
 CREATE TEMP TABLE temp_1 AS 
 SELECT 
 	*, 
@@ -127,7 +128,7 @@ SELECT
 		WHEN account_weeks <= 120 THEN 'Established'
 		WHEN account_weeks <= 180 THEN 'Long-term'
 		WHEN account_weeks <= 243 THEN 'Very long-term'
-	END AS segment
+	END AS customer_segment
 FROM 
 	telecom_churn;
 
@@ -137,7 +138,7 @@ FROM
 */
 
 	
-CREATE TEMPORARY TABLE temp_2 AS 
+CREATE TEMP TABLE temp_2 AS 
 SELECT 
 	s.*,
 	s1."Churned Customers"
@@ -179,7 +180,7 @@ FROM
 -- Segment customers into four monthly charge groups based on their monthly charges.
 
 DROP TABLE IF EXISTS temp_3;
-CREATE TEMPORARY TABLE temp_3 AS
+CREATE TEMP TABLE temp_3 AS
 SELECT 
 	*,
 	CASE
@@ -198,7 +199,7 @@ FROM
 */
 
 DROP TABLE IF EXISTS temp_4;
-CREATE TEMPORARY TABLE temp_4 AS 
+CREATE TEMP TABLE temp_4 AS 
 SELECT 
 	c.*,
 	c1."Churned Customers"
@@ -248,7 +249,7 @@ ORDER BY
 
 -- Segment customers based on their level of data usage.
 
-CREATE TEMPORARY TABLE temp_5 AS
+CREATE TEMP TABLE temp_5 AS
 SELECT
 	*,
 	CASE
@@ -266,7 +267,7 @@ FROM
 	then join both results to calculate the churn rate for each segment.	
 */
 
-CREATE TEMPORARY TABLE temp_6 AS	
+CREATE TEMP TABLE temp_6 AS	
 SELECT 
 	d.*,
 	d1."Churned Customers"
