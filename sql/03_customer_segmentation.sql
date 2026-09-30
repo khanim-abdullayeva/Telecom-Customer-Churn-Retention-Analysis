@@ -69,6 +69,8 @@ ON
 	
 -- Customer Value Segmentation
 
+DROP TABLE IF EXISTS temp_3;
+CREATE TEMPORARY TABLE temp_3 AS
 SELECT 
 	*,
 	CASE
@@ -79,6 +81,63 @@ SELECT
 	END AS monthly_charge_segment
 FROM
 	telecom_churn;
+
+
+DROP TABLE IF EXISTS temp_4;
+CREATE TEMP TABLE temp_4 AS 
+SELECT 
+	c.*,
+	c1."Churned Customers"
+FROM 	
+	(SELECT
+		monthly_charge_segment AS "Monthly Charge Segment",
+		COUNT(*) AS "Total Customers"
+	FROM	
+		temp_3
+	GROUP BY
+		monthly_charge_segment) c
+LEFT JOIN 
+	(SELECT 
+		monthly_charge_segment,
+		COUNT(*) AS "Churned Customers"
+	FROM 
+		temp_3
+	WHERE
+		churn = 1
+	GROUP BY 
+		monthly_charge_segment) c1
+ON
+	c."Monthly Charge Segment" = c1.monthly_charge_segment;
+	
+
+
+-- Customer Value Segment Performance
+SELECT
+		c.*,
+		c1."Average Monthly Charge",
+		c1."Average Tenure",
+		c1."Average Customer Service Calls"
+FROM	
+	(SELECT 
+		*,
+		ROUND(("Churned Customers" * 1.0 / "Total Customers") * 100, 2) AS "Churn Rate"
+	FROM 
+		temp_4
+	ORDER BY
+		"Churn Rate") c
+LEFT JOIN
+	(SELECT 
+		monthly_charge_segment,
+		ROUND(AVG(monthly_charge), 2) AS "Average Monthly Charge",
+		ROUND(AVG(account_weeks), 2) AS "Average Tenure",
+		ROUND(AVG(cust_serv_calls), 2) AS "Average Customer Service Calls"
+	FROM
+		temp_3
+	GROUP BY
+		monthly_charge_segment) c1
+ON
+	c."Monthly Charge Segment" = c1.monthly_charge_segment;
+
 	
 	
 -- Usage Segmentation
