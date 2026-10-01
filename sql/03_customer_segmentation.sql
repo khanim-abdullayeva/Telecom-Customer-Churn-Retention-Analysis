@@ -184,7 +184,7 @@ ON
 	
 	
 -- Data Usage Segment Performance
-select * from temp_6
+
 SELECT
 		d.*,
 		d1."Average Monthly Charge",
@@ -216,6 +216,7 @@ ON
 	
 -- Customer Service Risk Segmentation
 
+CREATE TEMP TABLE temp_11 AS
 SELECT
 	*,
 	CASE
