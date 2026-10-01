@@ -226,3 +226,34 @@ SELECT
 	END AS cust_serv_calls_segment
 FROM
 	telecom_churn;
+	
+	
+CREATE TEMP TABLE temp_12 AS	
+SELECT 
+	ct.*,
+	ct1."Churned Customers"
+FROM
+	(SELECT 
+		cust_serv_calls AS "Customer Service Calls Segment",
+		COUNT(*) AS "Total Customers"
+	FROM
+		temp_11
+	GROUP BY 
+		cust_serv_calls) ct
+LEFT JOIN
+	(SELECT
+		cust_serv_calls,
+		COUNT(*) AS "Churned Customers"
+	 FROM
+		temp_11
+	 WHERE
+		churn = 1
+	 GROUP BY
+		cust_serv_calls) ct1
+ON 
+	ct."Customer Service Calls Segment" = ct1.cust_serv_calls;	
+	
+	
+	
+-- Customer Service Risk Segmentation Performance
+
