@@ -141,8 +141,9 @@ ON
 
 	
 	
--- Usage Segmentation
+-- Data Usage Segmentation
 
+CREATE TEMP TABLE temp_5 AS
 SELECT
 	*,
 	CASE
@@ -153,6 +154,64 @@ SELECT
 	END AS data_usage_segment
 FROM
 	telecom_churn;
+	
+	
+CREATE TEMP TABLE temp_6 AS	
+SELECT 
+	d.*,
+	d1."Churned Customers"
+FROM
+	(SELECT 
+		data_usage_segment AS "Data Usage Segment",
+		COUNT(*) AS "Total Customers"
+	FROM
+		temp_5
+	GROUP BY 
+		data_usage_segment) d
+LEFT JOIN
+	(SELECT
+		data_usage_segment,
+		COUNT(*) AS "Churned Customers"
+	 FROM
+		temp_5
+	 WHERE
+		churn = 1
+	 GROUP BY
+		data_usage_segment) d1
+ON 
+	d."Data Usage Segment" = d1.data_usage_segment;	
+
+	
+	
+-- Data Usage Segment Performance
+select * from temp_6
+SELECT
+		d.*,
+		d1."Average Monthly Charge",
+		d1."Average Tenure",
+		d1."Average Customer Service Calls"
+FROM	
+	(SELECT 
+		*,
+		ROUND(("Churned Customers" * 1.0 / "Total Customers") * 100, 2) AS "Churn Rate"
+	FROM 
+		temp_6
+	ORDER BY
+		"Churn Rate") d
+LEFT JOIN
+	(SELECT 
+		data_usage_segment,
+		ROUND(AVG(monthly_charge), 2) AS "Average Monthly Charge",
+		ROUND(AVG(account_weeks), 2) AS "Average Tenure",
+		ROUND(AVG(cust_serv_calls), 2) AS "Average Customer Service Calls"
+	FROM
+		temp_5
+	GROUP BY
+		data_usage_segment) d1
+ON
+	d."Data Usage Segment" = d1.data_usage_segment;
+	
+	
 	
 	
 -- Customer Service Risk Segmentation
