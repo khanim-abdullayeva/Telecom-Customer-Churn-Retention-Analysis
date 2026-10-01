@@ -257,3 +257,27 @@ ON
 	
 -- Customer Service Risk Segmentation Performance
 
+
+SELECT
+		ct.*,
+		ct1."Average Monthly Charge",
+		ct1."Average Tenure"
+FROM	
+	(SELECT 
+		*,
+		ROUND(("Churned Customers" * 1.0 / "Total Customers") * 100, 2) AS "Churn Rate"
+	FROM 
+		temp_12
+	ORDER BY
+		"Churn Rate") ct
+LEFT JOIN
+	(SELECT 
+		cust_serv_calls,
+		ROUND(AVG(monthly_charge), 2) AS "Average Monthly Charge",
+		ROUND(AVG(account_weeks), 2) AS "Average Tenure"
+	FROM
+		temp_11
+	GROUP BY
+		cust_serv_calls) ct1
+ON
+	ct."Customer Service Calls Segment" = ct1.cust_serv_calls;
