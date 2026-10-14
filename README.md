@@ -162,7 +162,7 @@ These recommendations are hypotheses for business action based on model outputs,
 
 ## Conclusion
 
-This project demonstrates an end-to-end machine learning workflow for telecom customer churn analysis, from data preparation and model comparison to threshold optimization.
+This project demonstrates an end-to-end machine learning  for telecom customer churn analysis, from data preparation and model comparison to threshold optimization.
 
 The results show that the best model depends on the objective: Balanced Random Forest performed best in terms of F1-score at the default threshold, while weighted Gradient Boosting at a threshold of 0.45 offered higher recall. The final business choice should reflect the relative costs of missed churners and false-positive predictions.
 
