@@ -41,9 +41,9 @@ This class imbalance makes recall, precision, and F1-score particularly importan
 
 - **Python** — data analysis and machine learning
 - **Jupyter Notebook** — experimentation and documentation
-- **Pandas / Polars** — data manipulation, depending on the operations used in the notebook
+- **Pandas** — data manipulation, depending on the operations used in the notebook
 - **Scikit-learn** — preprocessing, model training, and evaluation
-- **Matplotlib / Seaborn** — visualizations, where used
+- **Matplotlib** — visualizations, where used
 - **Git & GitHub** — version control and project sharing
 
 ## Project Workflow
